@@ -1,0 +1,107 @@
+/* Common styles for Firefox internal pages */
+.newtab-page,
+.about-page {
+    background-color: var(--firefox-darker-bg);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* New Tab Page */
+.newtab-content {
+    max-width: 936px;
+    margin: 0 auto;
+    padding-top: 60px;
+}
+
+.search-wrapper {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.search-box {
+    display: inline-block;
+    width: 100%;
+    max-width: 584px;
+    position: relative;
+}
+
+.search-box input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    font-size: 17px;
+    background-color: var(--firefox-dark-bg);
+    border: 1px solid var(--firefox-border);
+    border-radius: 4px;
+    color: var(--firefox-text);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--firefox-focus);
+}
+
+.top-sites {
+    margin-top: 32px;
+}
+
+.top-sites h2 {
+    font-size: 13px;
+    color: var(--firefox-secondary-text);
+    margin-bottom: 16px;
+}
+
+.site-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 16px;
+    padding: 8px;
+}
+
+.site-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    padding: 16px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.site-tile:hover {
+    background-color: var(--firefox-toolbar);
+}
+
+.site-tile img {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+}
+
+.site-tile span {
+    color: var(--firefox-text);
+    font-size: 13px;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* About Page */
+.about-content {
+    max-width: 600px;
+    margin: 60px auto;
+    background-color: var(--firefox-dark-bg);
+    padding: 32px;
+    border-radius: 8px;
+}
+
+.about-content h1 {
+    margin-bottom: 16px;
+}
+
+.about-content p {
+    color: var(--firefox-secondary-text);
+    margin-bottom: 8px;
+}
