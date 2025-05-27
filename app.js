@@ -53,3 +53,41 @@ async function initializePWA() {
 window.addEventListener('load', initializePWA);
 
 // Rest of your app.js code will go here...
+// Add this to the existing app.js
+
+async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.register('/service-worker.js');
+            
+            // Handle updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New service worker available
+                        if (confirm('New version available! Update now?')) {
+                            newWorker.postMessage({ type: 'SKIP_WAITING' });
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
+            // Handle controller change
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                // Reload page when new service worker takes over
+                window.location.reload();
+            });
+
+            console.log('Service Worker registered successfully!');
+            return registration;
+        } catch (error) {
+            console.error('Service Worker registration failed:', error);
+        }
+    }
+}
+
+
+// Call this after IconGenerator initialization
+registerServiceWorker();
