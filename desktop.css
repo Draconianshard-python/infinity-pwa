@@ -1,0 +1,60 @@
+/* Title Bar (Windows/Linux) */
+#title-bar {
+    height: 32px;
+    background-color: var(--firefox-darker-bg);
+    display: flex;
+    justify-content: flex-end;
+    -webkit-app-region: drag;
+    app-region: drag;
+}
+
+.window-controls {
+    display: flex;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+}
+
+.window-control {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--firefox-text);
+}
+
+.window-control:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.window-control.close:hover {
+    background-color: #E81123;
+}
+
+/* Desktop-specific tab styles */
+.tab {
+    transition: background-color 0.2s;
+}
+
+.tab:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Desktop-specific sidebar */
+#sidebar {
+    transition: transform 0.3s ease;
+}
+
+/* Hide mobile elements */
+#mobile-nav-bar {
+    display: none;
+}
+
+/* Desktop-specific hover effects */
+button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.context-menu-item:hover {
+    background-color: var(--firefox-toolbar);
+}
