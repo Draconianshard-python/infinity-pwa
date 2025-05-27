@@ -1,0 +1,258 @@
+:root {
+    /* Firefox Theme Colors */
+    --firefox-dark-bg: #2B2A33;
+    --firefox-darker-bg: #1C1B22;
+    --firefox-toolbar: #42414D;
+    --firefox-active-tab: #42414D;
+    --firefox-inactive-tab: #32313C;
+    --firefox-text: #FBFBFE;
+    --firefox-secondary-text: #C4C7CE;
+    --firefox-border: #52525E;
+    --firefox-focus: #0DF;
+    --firefox-accent: #FF3B61;
+    
+    /* Dimensions */
+    --tab-height: 36px;
+    --navbar-height: 40px;
+    --sidebar-width: 320px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--firefox-darker-bg);
+    color: var(--firefox-text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+#browser-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--firefox-dark-bg);
+}
+
+/* Tab Bar Styles */
+#tab-bar {
+    height: var(--tab-height);
+    background-color: var(--firefox-darker-bg);
+    display: flex;
+    padding: 0 4px;
+    border-bottom: 1px solid var(--firefox-border);
+}
+
+#tabs-container {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#tabs-container::-webkit-scrollbar {
+    display: none;
+}
+
+.tab {
+    min-width: 100px;
+    max-width: 240px;
+    height: var(--tab-height);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    background-color: var(--firefox-inactive-tab);
+    border-radius: 8px 8px 0 0;
+    margin-right: 1px;
+    position: relative;
+    cursor: default;
+}
+
+.tab.active {
+    background-color: var(--firefox-active-tab);
+}
+
+.tab-favicon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.tab-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+}
+
+.tab-close {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.tab-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Navigation Bar Styles */
+#nav-bar {
+    height: var(--navbar-height);
+    background-color: var(--firefox-toolbar);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    gap: 8px;
+}
+
+#nav-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+button {
+    background: transparent;
+    border: none;
+    color: var(--firefox-text);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#urlbar-container {
+    flex: 1;
+    height: 32px;
+    background-color: var(--firefox-darker-bg);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+#identity-box {
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+}
+
+#urlbar {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--firefox-text);
+    font-size: 14px;
+    outline: none;
+    padding: 4px;
+}
+
+/* Content Area Styles */
+#content-area {
+    flex: 1;
+    position: relative;
+    background-color: white;
+}
+
+#browser-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Sidebar Styles */
+#sidebar {
+    position: fixed;
+    top: calc(var(--tab-height) + var(--navbar-height));
+    right: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--tab-height) - var(--navbar-height));
+    background-color: var(--firefox-darker-bg);
+    border-left: 1px solid var(--firefox-border);
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar[hidden] {
+    display: none;
+}
+
+#sidebar-header {
+    padding: 8px;
+    border-bottom: 1px solid var(--firefox-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#sidebar-select {
+    background-color: var(--firefox-toolbar);
+    color: var(--firefox-text);
+    border: 1px solid var(--firefox-border);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+#sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* Context Menu Styles */
+#context-menu {
+    position: fixed;
+    background-color: var(--firefox-darker-bg);
+    border: 1px solid var(--firefox-border);
+    border-radius: 4px;
+    padding: 4px 0;
+    min-width: 200px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.context-menu-item:hover {
+    background-color: var(--firefox-toolbar);
+}
+
+/* Common Utils */
+.icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-only {
+    display: none;
+}
