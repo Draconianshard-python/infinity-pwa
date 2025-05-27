@@ -1,30 +1,75 @@
-import IconGenerator from './icon-generator.js';
 import TabManager from './tab-manager.js';
+import StorageManager from './storage-manager.js';
+import BookmarkManager from './bookmark-manager.js';
+import HistoryManager from './history-manager.js';
+import DownloadManager from './download-manager.js';
 import IconGenerator from './icon-generator.js';
+
 class FirefoxPWA {
     constructor() {
-        this.tabManager = new TabManager();
+        this.initializeManagers();
         this.setupNavigationEvents();
         this.setupURLBar();
+        this.setupSidebarEvents();
+        this.setupWindowControls();
+        this.lastUpdateCheck = null;
+        this.setupAutoUpdater();
+    }
+
+    async initializeManagers() {
+        // Initialize storage first
+        this.storageManager = new StorageManager();
+        await this.storageManager.init();
+
+        // Initialize other managers
+        this.tabManager = new TabManager();
+        this.bookmarkManager = new BookmarkManager(this.storageManager);
+        this.historyManager = new HistoryManager(this.storageManager);
+        this.downloadManager = new DownloadManager(this.storageManager);
+
+        // Create initial tab if none exists
+        if (this.tabManager.tabs.size === 0) {
+            this.tabManager.createNewTab();
+        }
     }
 
     setupNavigationEvents() {
         const backBtn = document.getElementById('back-button');
         const forwardBtn = document.getElementById('forward-button');
         const reloadBtn = document.getElementById('reload-button');
+        const menuBtn = document.getElementById('menu-button');
 
         backBtn.addEventListener('click', () => {
-            history.back();
+            const frame = document.getElementById('browser-frame');
+            if (frame.contentWindow.history.length > 0) {
+                frame.contentWindow.history.back();
+            }
+            this.updateNavigationButtons();
         });
 
         forwardBtn.addEventListener('click', () => {
-            history.forward();
+            const frame = document.getElementById('browser-frame');
+            frame.contentWindow.history.forward();
+            this.updateNavigationButtons();
         });
 
         reloadBtn.addEventListener('click', () => {
             const frame = document.getElementById('browser-frame');
             frame.contentWindow.location.reload();
         });
+
+        menuBtn.addEventListener('click', () => {
+            this.toggleMenu();
+        });
+    }
+
+    updateNavigationButtons() {
+        const frame = document.getElementById('browser-frame');
+        const backBtn = document.getElementById('back-button');
+        const forwardBtn = document.getElementById('forward-button');
+
+        backBtn.disabled = !frame.contentWindow.history.length;
+        forwardBtn.disabled = !frame.contentWindow.history.length;
     }
 
     setupURLBar() {
@@ -34,6 +79,12 @@ class FirefoxPWA {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 let url = urlbar.value.trim();
+                
+                // Handle special firefox: URLs
+                if (url.startsWith('firefox:')) {
+                    this.handleFirefoxURL(url);
+                    return;
+                }
                 
                 // Handle search queries
                 if (!url.includes('.') || url.includes(' ')) {
@@ -48,106 +99,197 @@ class FirefoxPWA {
                 document.getElementById('browser-frame').src = url;
             }
         });
+
+        // Handle URL bar focus
+        urlbar.addEventListener('focus', () => {
+            urlbar.select();
+        });
+    }
+
+    handleFirefoxURL(url) {
+        const pages = {
+            'firefox:newtab': '/firefox-pages/newtab.html',
+            'firefox:downloads': '/firefox-pages/downloads.html',
+            'firefox:history': '/firefox-pages/history.html',
+            'firefox:bookmarks': '/firefox-pages/bookmarks.html',
+            'firefox:settings': '/firefox-pages/settings.html',
+            'firefox:about': '/firefox-pages/about.html'
+        };
+
+        const page = pages[url] || pages['firefox:newtab'];
+        this.tabManager.updateActiveTab({ url: page });
+        document.getElementById('browser-frame').src = page;
+    }
+
+    setupSidebarEvents() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarSelect = document.getElementById('sidebar-select');
+        const sidebarContent = document.getElementById('sidebar-content');
+        const sidebarClose = document.getElementById('sidebar-close');
+
+        sidebarSelect.addEventListener('change', async () => {
+            await this.updateSidebarContent(sidebarSelect.value);
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.hidden = true;
+        });
+
+        // Handle sidebar item clicks
+        sidebarContent.addEventListener('click', (e) => {
+            const item = e.target.closest('.sidebar-item');
+            if (!item) return;
+
+            const deleteButton = e.target.closest('.delete-button');
+            if (deleteButton) {
+                this.handleSidebarItemDelete(item);
+            } else {
+                this.handleSidebarItemClick(item);
+            }
+        });
+    }
+
+    async updateSidebarContent(type) {
+        const container = document.getElementById('sidebar-content');
+        
+        switch (type) {
+            case 'bookmarks':
+                await this.showBookmarks(container);
+                break;
+            case 'history':
+                await this.showHistory(container);
+                break;
+            case 'downloads':
+                await this.showDownloads(container);
+                break;
+        }
+    }
+
+    async showBookmarks(container) {
+        const bookmarks = await this.bookmarkManager.getAllBookmarks();
+        container.innerHTML = bookmarks.map(bookmark => `
+            <div class="sidebar-item bookmark-item" data-id="${bookmark.id}" data-url="${bookmark.url}">
+                <img src="${bookmark.favicon}" alt="">
+                <span>${bookmark.title}</span>
+                <button class="delete-button" aria-label="Delete bookmark">×</button>
+            </div>
+        `).join('');
+    }
+
+    async showHistory(container) {
+        const history = await this.historyManager.getHistory();
+        container.innerHTML = history.map(entry => `
+            <div class="sidebar-item history-item" data-id="${entry.id}" data-url="${entry.url}">
+                <img src="${entry.favicon}" alt="">
+                <span>${entry.title}</span>
+                <small>${new Date(entry.timestamp).toLocaleString()}</small>
+                <button class="delete-button" aria-label="Delete history entry">×</button>
+            </div>
+        `).join('');
+    }
+
+    async showDownloads(container) {
+        const downloads = await this.downloadManager.getDownloads();
+        container.innerHTML = downloads.map(download => `
+            <div class="sidebar-item download-item" data-id="${download.id}">
+                <span>${download.filename}</span>
+                <small>${download.status}</small>
+                ${download.status === 'in_progress' ? 
+                    `<progress value="${download.progress}" max="100"></progress>` : 
+                    ''}
+                <button class="delete-button" aria-label="Delete download">×</button>
+            </div>
+        `).join('');
+    }
+
+    handleSidebarItemClick(item) {
+        const url = item.dataset.url;
+        if (url) {
+            this.tabManager.createNewTab(url);
+        }
+    }
+
+    async handleSidebarItemDelete(item) {
+        const { id } = item.dataset;
+        const type = item.classList.contains('bookmark-item') ? 'bookmarks' :
+                    item.classList.contains('history-item') ? 'history' : 'downloads';
+        
+        await this.storageManager.deleteItem(type, id);
+        item.remove();
+    }
+
+    setupWindowControls() {
+        const minimizeBtn = document.querySelector('.window-control.minimize');
+        const maximizeBtn = document.querySelector('.window-control.maximize');
+        const closeBtn = document.querySelector('.window-control.close');
+
+        if (minimizeBtn) {
+            minimizeBtn.addEventListener('click', () => {
+                if (window.electron) {
+                    window.electron.minimizeWindow();
+                }
+            });
+        }
+
+        if (maximizeBtn) {
+            maximizeBtn.addEventListener('click', () => {
+                if (window.electron) {
+                    window.electron.maximizeWindow();
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                if (window.electron) {
+                    window.electron.closeWindow();
+                }
+            });
+        }
+    }
+
+    setupAutoUpdater() {
+        setInterval(() => {
+            this.checkForUpdates();
+        }, 1000 * 60 * 60); // Check every hour
+    }
+
+    async checkForUpdates() {
+        const now = new Date();
+        if (this.lastUpdateCheck && 
+            (now - this.lastUpdateCheck) < (1000 * 60 * 60)) {
+            return;
+        }
+
+        this.lastUpdateCheck = now;
+
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.update();
+        }
+    }
+
+    toggleMenu() {
+        // Implementation for menu toggle
     }
 }
 
 // Initialize the app
-window.addEventListener('load', () => {
-    window.app = new FirefoxPWA();
-});
-
-async function registerServiceWorker() {
+window.addEventListener('load', async () => {
+    // Initialize PWA features
+    const iconGenerator = new IconGenerator();
+    await iconGenerator.generateIcons();
+    
+    // Register service worker
     if ('serviceWorker' in navigator) {
         try {
             const registration = await navigator.serviceWorker.register('/service-worker.js');
-            
-            // Handle updates
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // New service worker available
-                        if (confirm('New version available! Update now?')) {
-                            newWorker.postMessage({ type: 'SKIP_WAITING' });
-                            window.location.reload();
-                        }
-                    }
-                });
-            });
-
-            // Handle controller change
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                // Reload page when new service worker takes over
-                window.location.reload();
-            });
-
-            console.log('Service Worker registered successfully!');
-            return registration;
-        } catch (error) {
-            console.error('Service Worker registration failed:', error);
+            console.log('ServiceWorker registration successful');
+        } catch (err) {
+            console.error('ServiceWorker registration failed: ', err);
         }
     }
-}
-}
 
-
-async function initializePWA() {
-    // Generate icons
-    const iconGenerator = new IconGenerator();
-    const icons = await iconGenerator.generateIcons();
-    
-    // Update manifest with generated icons
-    const manifest = await (await fetch('manifest.json')).json();
-    
-    // Add regular and maskable icons
-    manifest.icons = Object.entries(icons)
-        .filter(([name]) => name.startsWith('firefox-'))
-        .map(([name, dataUrl]) => {
-            const size = name.match(/\d+/)[0];
-            const isMaskable = name.includes('maskable');
-            return {
-                src: dataUrl,
-                sizes: `${size}x${size}`,
-                type: 'image/png',
-                purpose: isMaskable ? 'maskable' : 'any'
-            };
-        });
-    
-    // Add shortcut icons
-    manifest.shortcuts.forEach(shortcut => {
-        const iconName = shortcut.url.includes('private') ? 'private-96' : 'new-tab-96';
-        shortcut.icons = [{
-            src: icons[iconName],
-            sizes: '96x96',
-            type: 'image/png'
-        }];
-    });
-
-    // Create and inject dynamic manifest
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    const manifestUrl = URL.createObjectURL(manifestBlob);
-    
-    // Update manifest link
-    const manifestLink = document.querySelector('link[rel="manifest"]');
-    manifestLink.href = manifestUrl;
-
-    // Update favicon
-    const favicon = document.querySelector('link[rel="icon"]');
-    favicon.href = icons['firefox-196'];
-    
-    // Update apple-touch-icon
-    const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
-    appleIcon.href = icons['firefox-180'];
-}
-
-// Initialize when the page loads
-window.addEventListener('load', initializePWA);
-
-// Rest of your app.js code will go here...
-// Add this to the existing app.js
-
-
-
-
-// Call this after IconGenerator initialization
-registerServiceWorker();
+    // Create app instance
+    window.app = new FirefoxPWA();
+});
