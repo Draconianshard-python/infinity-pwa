@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2B2A33">
+    <meta name="description" content="Firefox UI Clone - Progressive Web App">
+    <title>Firefox PWA Clone</title>
+
+    <!-- PWA requirements -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="196x196" href="assets/icons/firefox-196.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/firefox-180.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/desktop.css" media="(min-width: 768px)">
+    <link rel="stylesheet" href="css/mobile.css" media="(max-width: 767px)">
+
+    <!-- Preload critical assets -->
+    <link rel="preload" href="assets/fonts/firefox-icons.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+<body>
+    <!-- App Shell -->
+    <div id="browser-container">
+        <!-- Title Bar (Windows/Linux) -->
+        <div id="title-bar" class="windows-only">
+            <div class="window-controls">
+                <button class="window-control minimize" aria-label="Minimize"></button>
+                <button class="window-control maximize" aria-label="Maximize"></button>
+                <button class="window-control close" aria-label="Close"></button>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div id="tab-bar">
+            <div id="tabs-container">
+                <!-- Tabs will be dynamically inserted here -->
+            </div>
+            <button id="new-tab-button" aria-label="New Tab">
+                <span class="icon">+</span>
+            </button>
+        </div>
+
+        <!-- Navigation Bar -->
+        <div id="nav-bar">
+            <div id="nav-buttons">
+                <button id="back-button" aria-label="Back" disabled>
+                    <span class="icon">←</span>
+                </button>
+                <button id="forward-button" aria-label="Forward" disabled>
+                    <span class="icon">→</span>
+                </button>
+                <button id="reload-button" aria-label="Reload">
+                    <span class="icon">↻</span>
+                </button>
+            </div>
+
+            <div id="urlbar-container">
+                <div id="identity-box">
+                    <div id="identity-icon"></div>
+                </div>
+                <input type="text" id="urlbar" aria-label="Address Bar" placeholder="Search with Google or enter address">
+            </div>
+
+            <div id="nav-bar-buttons">
+                <button id="bookmarks-button" aria-label="Bookmarks">
+                    <span class="icon">⭐</span>
+                </button>
+                <button id="menu-button" aria-label="Menu">
+                    <span class="icon">☰</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div id="content-area">
+            <div id="browser-frame">
+                <!-- Browser content will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div id="sidebar" hidden>
+            <div id="sidebar-header">
+                <select id="sidebar-select">
+                    <option value="bookmarks">Bookmarks</option>
+                    <option value="history">History</option>
+                    <option value="downloads">Downloads</option>
+                </select>
+                <button id="sidebar-close" aria-label="Close Sidebar">✕</button>
+            </div>
+            <div id="sidebar-content"></div>
+        </div>
+
+        <!-- Mobile Navigation Bar -->
+        <div id="mobile-nav-bar" class="mobile-only">
+            <button class="mobile-nav-button" id="mobile-home">
+                <span class="icon">🏠</span>
+            </button>
+            <button class="mobile-nav-button" id="mobile-tabs">
+                <span class="icon">📑</span>
+            </button>
+            <button class="mobile-nav-button" id="mobile-menu">
+                <span class="icon">☰</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Context Menus -->
+    <div id="context-menu" hidden></div>
+
+    <!-- Scripts -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
