@@ -1,0 +1,105 @@
+/* Hide desktop-specific elements */
+#title-bar,
+.window-controls {
+    display: none;
+}
+
+/* Mobile tab bar adjustments */
+#tab-bar {
+    height: 40px;
+    padding: 4px;
+}
+
+.tab {
+    min-width: 80px;
+    max-width: 160px;
+    font-size: 12px;
+}
+
+/* Mobile navigation adjustments */
+#nav-bar {
+    height: 48px;
+}
+
+#nav-buttons button {
+    padding: 12px;
+}
+
+#urlbar-container {
+    height: 36px;
+}
+
+/* Mobile bottom navigation */
+#mobile-nav-bar {
+    display: flex;
+    height: 56px;
+    background-color: var(--firefox-toolbar);
+    border-top: 1px solid var(--firefox-border);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 16px;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.mobile-nav-button {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--firefox-text);
+    font-size: 12px;
+}
+
+.mobile-nav-button .icon {
+    font-size: 20px;
+}
+
+/* Mobile content area adjustments */
+#content-area {
+    margin-bottom: 56px; /* Account for mobile navigation */
+}
+
+/* Mobile sidebar adjustments */
+#sidebar {
+    width: 100%;
+    transform: translateX(100%);
+}
+
+#sidebar.visible {
+    transform: translateX(0);
+}
+
+/* Mobile context menu */
+#context-menu {
+    bottom: 56px !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-radius: 12px 12px 0 0;
+}
+
+.context-menu-item {
+    padding: 16px;
+    font-size: 16px;
+}
+
+/* Mobile touch optimizations */
+button,
+.tab,
+.context-menu-item {
+    min-height: 44px; /* Minimum touch target size */
+}
+
+/* Adjust font sizes for mobile */
+#urlbar {
+    font-size: 16px;
+}
+
+.tab-title {
+    font-size: 14px;
+}
