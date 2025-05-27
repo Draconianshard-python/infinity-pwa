@@ -41,7 +41,43 @@ body {
     background-color: var(--firefox-dark-bg);
 }
 
-/* Tab Bar Styles */
+/* Title Bar */
+#title-bar {
+    height: 32px;
+    background-color: var(--firefox-darker-bg);
+    display: flex;
+    justify-content: flex-end;
+    -webkit-app-region: drag;
+    app-region: drag;
+}
+
+.window-controls {
+    display: flex;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+}
+
+.window-control {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--firefox-text);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.window-control:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.window-control.close:hover {
+    background-color: #E81123;
+}
+
+/* Tab Bar */
 #tab-bar {
     height: var(--tab-height);
     background-color: var(--firefox-darker-bg);
@@ -73,10 +109,15 @@ body {
     margin-right: 1px;
     position: relative;
     cursor: default;
+    transition: background-color 0.2s;
 }
 
 .tab.active {
     background-color: var(--firefox-active-tab);
+}
+
+.tab:hover {
+    background-color: var(--firefox-toolbar);
 }
 
 .tab-favicon {
@@ -109,7 +150,7 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Navigation Bar Styles */
+/* Navigation Bar */
 #nav-bar {
     height: var(--navbar-height);
     background-color: var(--firefox-toolbar);
@@ -171,7 +212,7 @@ button:disabled {
     padding: 4px;
 }
 
-/* Content Area Styles */
+/* Content Area */
 #content-area {
     flex: 1;
     position: relative;
@@ -184,7 +225,7 @@ button:disabled {
     border: none;
 }
 
-/* Sidebar Styles */
+/* Sidebar */
 #sidebar {
     position: fixed;
     top: calc(var(--tab-height) + var(--navbar-height));
@@ -195,6 +236,7 @@ button:disabled {
     border-left: 1px solid var(--firefox-border);
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease;
 }
 
 #sidebar[hidden] {
@@ -223,7 +265,54 @@ button:disabled {
     padding: 8px;
 }
 
-/* Context Menu Styles */
+/* Sidebar Items */
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.sidebar-item:hover {
+    background-color: var(--firefox-toolbar);
+}
+
+.sidebar-item img {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+}
+
+.sidebar-item span {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-item small {
+    color: var(--firefox-secondary-text);
+    margin-left: 8px;
+}
+
+.sidebar-item .delete-button {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.sidebar-item:hover .delete-button {
+    opacity: 1;
+}
+
+.sidebar-item progress {
+    width: 100%;
+    height: 2px;
+    margin-top: 4px;
+}
+
+/* Context Menu */
 #context-menu {
     position: fixed;
     background-color: var(--firefox-darker-bg);
@@ -244,7 +333,23 @@ button:disabled {
     background-color: var(--firefox-toolbar);
 }
 
-/* Common Utils */
+/* Progress Bars */
+progress {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+progress::-webkit-progress-bar {
+    background-color: var(--firefox-border);
+    border-radius: 2px;
+}
+
+progress::-webkit-progress-value {
+    background-color: var(--firefox-focus);
+    border-radius: 2px;
+}
+
+/* Utils */
 .icon {
     width: 16px;
     height: 16px;
@@ -255,4 +360,29 @@ button:disabled {
 
 .mobile-only {
     display: none;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--firefox-darker-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--firefox-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--firefox-toolbar);
+}
+
+/* Firefox Scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--firefox-border) var(--firefox-darker-bg);
 }
